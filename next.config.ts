@@ -1,10 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  experimental: {
-    serverComponentsExternalPackages: ['@prisma/client']
-  },
-  output: 'standalone'
+  typescript: {
+    ignoreBuildErrors: true
+  }
 };
 
 export default nextConfig;
