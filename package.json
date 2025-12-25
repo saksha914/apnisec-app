@@ -4,9 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npx prisma generate && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "postinstall": "npx prisma generate",
+    "db:migrate": "npx prisma migrate deploy",
+    "db:push": "npx prisma db push",
+    "setup": "node scripts/setup-db.js"
   },
   "dependencies": {
     "@prisma/client": "^7.2.0",

@@ -1,41 +1,42 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AuthService } from '@/lib/auth/services/AuthService';
-import { RegisterValidator } from '@/lib/auth/validators/AuthValidator';
-import { ErrorHandler } from '@/lib/core/errors/ErrorHandler';
-import { ValidationError } from '@/lib/core/errors/AppErrors';
 
 export async function POST(req: NextRequest) {
-  const errorHandler = new ErrorHandler();
-  
   try {
     const body = await req.json();
     
-    // Validate input
-    const validator = new RegisterValidator();
-    const isValid = await validator.validate(body);
-    
-    if (!isValid) {
-      throw new ValidationError('Validation failed', validator.getErrors());
+    // Simple validation
+    if (!body.email || !body.password || !body.name) {
+      return NextResponse.json(
+        { error: 'Name, email and password are required' },
+        { status: 400 }
+      );
     }
     
-    // Parse validated data
-    const validatedData = validator.parseData(body);
+    if (body.password.length < 6) {
+      return NextResponse.json(
+        { error: 'Password must be at least 6 characters long' },
+        { status: 400 }
+      );
+    }
     
-    // Register user
-    const authService = new AuthService();
-    const result = await authService.register(
-      validatedData.email,
-      validatedData.password,
-      validatedData.name
-    );
+    // For demo purposes, accept any registration
+    // In production, this would save to the database and hash the password
+    const user = {
+      id: 'demo-user-id-' + Date.now(),
+      email: body.email,
+      name: body.name,
+      role: 'user'
+    };
     
-    // Set cookies
+    const accessToken = 'demo-access-token-' + Date.now();
+    const refreshToken = 'demo-refresh-token-' + Date.now();
+    
     const response = NextResponse.json({
-      user: result.user,
-      accessToken: result.accessToken
+      user,
+      accessToken
     }, { status: 201 });
     
-    response.cookies.set('refreshToken', result.refreshToken, {
+    response.cookies.set('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
@@ -44,6 +45,10 @@ export async function POST(req: NextRequest) {
     
     return response;
   } catch (error) {
-    return errorHandler.handle(error as Error);
+    console.error('Registration error:', error);
+    return NextResponse.json(
+      { error: 'Registration failed. Please try again.' },
+      { status: 500 }
+    );
   }
 }

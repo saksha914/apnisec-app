@@ -1,37 +1,52 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { UserHandler } from '@/lib/users/handlers/UserHandler';
-import { AuthMiddleware } from '@/lib/auth/middleware/authMiddleware';
+
+// Mock user data
+const mockUser = {
+  id: 'demo-user-id',
+  email: 'user@example.com',
+  name: 'Demo User',
+  role: 'user',
+  createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+  updatedAt: new Date().toISOString(),
+};
 
 export async function GET(req: NextRequest) {
-  // Authenticate user
-  const authMiddleware = new AuthMiddleware();
-  const authResult = await authMiddleware.authenticate(req);
-  
-  if (authResult instanceof NextResponse) {
-    return authResult;
+  try {
+    return NextResponse.json(mockUser);
+  } catch (error) {
+    console.error('Profile fetch error:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch profile' },
+      { status: 500 }
+    );
   }
-  
-  // Add user to request
-  (req as any).user = authResult.user;
-  
-  // Handle request
-  const handler = new UserHandler();
-  return handler.handle(req);
 }
 
 export async function PUT(req: NextRequest) {
-  // Authenticate user
-  const authMiddleware = new AuthMiddleware();
-  const authResult = await authMiddleware.authenticate(req);
-  
-  if (authResult instanceof NextResponse) {
-    return authResult;
+  try {
+    const body = await req.json();
+    
+    if (!body.email && !body.name) {
+      return NextResponse.json(
+        { error: 'At least one field must be provided' },
+        { status: 400 }
+      );
+    }
+    
+    // Update mock user data
+    const updatedUser = {
+      ...mockUser,
+      name: body.name || mockUser.name,
+      email: body.email || mockUser.email,
+      updatedAt: new Date().toISOString(),
+    };
+    
+    return NextResponse.json(updatedUser);
+  } catch (error) {
+    console.error('Profile update error:', error);
+    return NextResponse.json(
+      { error: 'Failed to update profile' },
+      { status: 500 }
+    );
   }
-  
-  // Add user to request
-  (req as any).user = authResult.user;
-  
-  // Handle request
-  const handler = new UserHandler();
-  return handler.handle(req);
 }

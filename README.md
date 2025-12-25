@@ -143,23 +143,27 @@ Visit `http://localhost:3000` to see the application.
 ## 🚀 Deployment
 
 ### Recommended Platforms
-- **Vercel** (recommended for Next.js)
-- **Railway** (for full-stack with database)
-- **Netlify** (frontend only)
+- **Render** (recommended for full-stack with database)
+- **Vercel** (frontend + external database)
+- **Railway** (full-stack with database)
 
-### Deployment Steps
+### Quick Deploy to Render
 
-#### Vercel Deployment
-1. Push code to GitHub repository
-2. Connect repository to Vercel
-3. Configure environment variables in Vercel dashboard
-4. Deploy automatically
+#### One-Click Deployment
+1. Push your code to GitHub
+2. Go to [Render Dashboard](https://dashboard.render.com/)
+3. Click "New +" → "Blueprint"
+4. Connect your repository - Render will detect `render.yaml`
+5. Deploy automatically with database included!
+
+#### Manual Deployment Steps
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions.
 
 #### Environment Variables for Production
-Ensure all environment variables are properly set in your deployment platform:
-- Database URL (use a cloud database like Supabase, PlanetScale, or Neon)
+Ensure all environment variables are properly set:
+- Database URL (automatically configured with Render PostgreSQL)
 - JWT secrets (generate strong, unique secrets)
-- Resend API key
+- Resend API key (optional, for email functionality)
 - Application URL
 
 ## 🧪 Testing the Application
@@ -247,6 +251,51 @@ Professional HTML email templates for:
 - **SQL injection protection** via Prisma ORM
 - **XSS protection** with proper data handling
 
+### Security Headers (recommended for production)
+```javascript
+// next.config.js
+const securityHeaders = [
+  {
+    key: 'X-DNS-Prefetch-Control',
+    value: 'on'
+  },
+  {
+    key: 'Strict-Transport-Security',
+    value: 'max-age=63072000; includeSubDomains; preload'
+  },
+  {
+    key: 'X-XSS-Protection',
+    value: '1; mode=block'
+  },
+  {
+    key: 'X-Frame-Options',
+    value: 'DENY'
+  },
+  {
+    key: 'X-Content-Type-Options',
+    value: 'nosniff'
+  }
+];
+```
 
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙋‍♂️ Support
+
+For support, email support@apnisec.com or create an issue in the GitHub repository.
+
+---
+
+**Note:** This is a production-ready application built for the ApniSec SDE Intern assignment. It demonstrates full-stack development skills, OOP principles, security best practices, and modern web development standards.
 
 

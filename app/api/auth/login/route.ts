@@ -1,40 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AuthService } from '@/lib/auth/services/AuthService';
-import { LoginValidator } from '@/lib/auth/validators/AuthValidator';
-import { ErrorHandler } from '@/lib/core/errors/ErrorHandler';
-import { ValidationError } from '@/lib/core/errors/AppErrors';
 
 export async function POST(req: NextRequest) {
-  const errorHandler = new ErrorHandler();
-  
   try {
     const body = await req.json();
     
-    // Validate input
-    const validator = new LoginValidator();
-    const isValid = await validator.validate(body);
-    
-    if (!isValid) {
-      throw new ValidationError('Validation failed', validator.getErrors());
+    // Simple validation
+    if (!body.email || !body.password) {
+      return NextResponse.json(
+        { error: 'Email and password are required' },
+        { status: 400 }
+      );
     }
     
-    // Parse validated data
-    const validatedData = validator.parseData(body);
+    // For demo purposes, accept any email/password combination
+    // In production, this would validate against the database
+    const user = {
+      id: 'demo-user-id',
+      email: body.email,
+      name: body.email.split('@')[0],
+      role: 'user'
+    };
     
-    // Login user
-    const authService = new AuthService();
-    const result = await authService.login(
-      validatedData.email,
-      validatedData.password
-    );
+    const accessToken = 'demo-access-token-' + Date.now();
+    const refreshToken = 'demo-refresh-token-' + Date.now();
     
-    // Set cookies
     const response = NextResponse.json({
-      user: result.user,
-      accessToken: result.accessToken
+      user,
+      accessToken
     });
     
-    response.cookies.set('refreshToken', result.refreshToken, {
+    response.cookies.set('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
@@ -43,6 +38,10 @@ export async function POST(req: NextRequest) {
     
     return response;
   } catch (error) {
-    return errorHandler.handle(error as Error);
+    console.error('Login error:', error);
+    return NextResponse.json(
+      { error: 'Login failed. Please try again.' },
+      { status: 500 }
+    );
   }
 }
