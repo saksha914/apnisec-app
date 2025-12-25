@@ -1,35 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { AuthService } from '@/lib/auth/services/AuthService';
+import { AuthenticationError, ValidationError } from '@/lib/core/errors/AppErrors';
 
 export async function POST(req: NextRequest) {
+  const authService = new AuthService();
+  
   try {
     const body = await req.json();
     
-    // Simple validation
-    if (!body.email || !body.password) {
-      return NextResponse.json(
-        { error: 'Email and password are required' },
-        { status: 400 }
-      );
-    }
-    
-    // For demo purposes, accept any email/password combination
-    // In production, this would validate against the database
-    const user = {
-      id: 'demo-user-id',
-      email: body.email,
-      name: body.email.split('@')[0],
-      role: 'user'
-    };
-    
-    const accessToken = 'demo-access-token-' + Date.now();
-    const refreshToken = 'demo-refresh-token-' + Date.now();
+    const result = await authService.login(body.email, body.password);
     
     const response = NextResponse.json({
-      user,
-      accessToken
+      user: result.user,
+      accessToken: result.accessToken
     });
     
-    response.cookies.set('refreshToken', refreshToken, {
+    response.cookies.set('refreshToken', result.refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
@@ -39,6 +25,21 @@ export async function POST(req: NextRequest) {
     return response;
   } catch (error) {
     console.error('Login error:', error);
+    
+    if (error instanceof AuthenticationError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 401 }
+      );
+    }
+    
+    if (error instanceof ValidationError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 400 }
+      );
+    }
+    
     return NextResponse.json(
       { error: 'Login failed. Please try again.' },
       { status: 500 }

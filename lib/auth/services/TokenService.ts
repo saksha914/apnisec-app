@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import { ITokenService, JWTPayload } from '../interfaces/auth.interfaces';
 
 export class TokenService implements ITokenService {
@@ -28,7 +28,7 @@ export class TokenService implements ITokenService {
     };
     
     return jwt.sign(tokenPayload, this.accessTokenSecret, {
-      expiresIn: this.accessTokenExpiry
+      expiresIn: this.accessTokenExpiry as any
     });
   }
 
@@ -40,7 +40,7 @@ export class TokenService implements ITokenService {
     };
     
     return jwt.sign(tokenPayload, this.refreshTokenSecret, {
-      expiresIn: this.refreshTokenExpiry
+      expiresIn: this.refreshTokenExpiry as any
     });
   }
 

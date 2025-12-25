@@ -1,4 +1,5 @@
-import { PrismaClient, User } from '@prisma/client';
+import { User } from '@prisma/client';
+import { prisma } from '@/lib/database/prisma';
 import { IAuthService, AuthResponse, JWTPayload } from '../interfaces/auth.interfaces';
 import { PasswordService } from './PasswordService';
 import { TokenService } from './TokenService';
@@ -6,13 +7,11 @@ import { EmailService } from '@/lib/email/services/EmailService';
 import { AuthenticationError, ConflictError, ValidationError } from '@/lib/core/errors/AppErrors';
 
 export class AuthService implements IAuthService {
-  private prisma: PrismaClient;
   private passwordService: PasswordService;
   private tokenService: TokenService;
   private emailService: EmailService;
 
   constructor() {
-    this.prisma = new PrismaClient();
     this.passwordService = new PasswordService();
     this.tokenService = new TokenService();
     this.emailService = new EmailService();
@@ -33,7 +32,7 @@ export class AuthService implements IAuthService {
     }
 
     // Check if user already exists
-    const existingUser = await this.prisma.user.findUnique({
+    const existingUser = await prisma.user.findUnique({
       where: { email }
     });
 
@@ -45,7 +44,7 @@ export class AuthService implements IAuthService {
     const hashedPassword = await this.passwordService.hash(password);
 
     // Create user
-    const user = await this.prisma.user.create({
+    const user = await prisma.user.create({
       data: {
         email,
         password: hashedPassword,
@@ -64,7 +63,7 @@ export class AuthService implements IAuthService {
     const refreshToken = this.tokenService.generateRefreshToken(payload);
 
     // Save refresh token to database
-    await this.prisma.user.update({
+    await prisma.user.update({
       where: { id: user.id },
       data: { refreshToken }
     });
@@ -91,7 +90,7 @@ export class AuthService implements IAuthService {
     }
 
     // Find user
-    const user = await this.prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { email }
     });
 
@@ -117,7 +116,7 @@ export class AuthService implements IAuthService {
     const refreshToken = this.tokenService.generateRefreshToken(payload);
 
     // Save refresh token to database
-    await this.prisma.user.update({
+    await prisma.user.update({
       where: { id: user.id },
       data: { refreshToken }
     });
@@ -133,7 +132,7 @@ export class AuthService implements IAuthService {
   }
 
   async logout(userId: string): Promise<void> {
-    await this.prisma.user.update({
+    await prisma.user.update({
       where: { id: userId },
       data: { refreshToken: null }
     });
@@ -153,7 +152,7 @@ export class AuthService implements IAuthService {
     }
 
     // Find user with this refresh token
-    const user = await this.prisma.user.findFirst({
+    const user = await prisma.user.findFirst({
       where: {
         id: payload.userId,
         refreshToken
@@ -175,7 +174,7 @@ export class AuthService implements IAuthService {
     const newRefreshToken = this.tokenService.generateRefreshToken(newPayload);
 
     // Update refresh token in database
-    await this.prisma.user.update({
+    await prisma.user.update({
       where: { id: user.id },
       data: { refreshToken: newRefreshToken }
     });
@@ -197,7 +196,7 @@ export class AuthService implements IAuthService {
   async getUserFromToken(token: string): Promise<User | null> {
     try {
       const payload = this.tokenService.verifyAccessToken(token);
-      const user = await this.prisma.user.findUnique({
+      const user = await prisma.user.findUnique({
         where: { id: payload.userId }
       });
       return user;

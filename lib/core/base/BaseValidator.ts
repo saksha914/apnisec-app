@@ -17,7 +17,7 @@ export abstract class BaseValidator<T> implements IValidator {
       return true;
     } catch (error) {
       if (error instanceof ZodError) {
-        this.errors = error.errors.map(err => 
+        this.errors = error.issues.map(err => 
           `${err.path.join('.')}: ${err.message}`
         );
       } else {
@@ -41,7 +41,7 @@ export abstract class BaseValidator<T> implements IValidator {
       return { success: true, data: parsedData };
     } catch (error) {
       if (error instanceof ZodError) {
-        const errors = error.errors.map(err => 
+        const errors = error.issues.map(err => 
           `${err.path.join('.')}: ${err.message}`
         );
         return { success: false, errors };
