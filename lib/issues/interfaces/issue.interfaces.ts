@@ -12,10 +12,10 @@ export interface IIssueRepository {
 
 export interface IIssueService {
   getByIdForUser(id: string, userId: string): Promise<Issue>;
-  getAll(userId: string, filter: IssueFilter): Promise<IssuePaginatedResponse>;
-  create(userId: string, data: CreateIssueDto): Promise<Issue>;
-  update(id: string, userId: string, data: UpdateIssueDto): Promise<Issue>;
-  delete(id: string, userId: string): Promise<void>;
+  getAllForUser(userId: string, filter: IssueFilter): Promise<IssuePaginatedResponse>;
+  createForUser(userId: string, data: CreateIssueDto): Promise<Issue>;
+  updateForUser(id: string, userId: string, data: UpdateIssueDto): Promise<Issue>;
+  deleteForUser(id: string, userId: string): Promise<void>;
 }
 
 export interface CreateIssueDto {

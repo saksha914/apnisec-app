@@ -38,7 +38,7 @@ export class IssueService extends BaseService<Issue> implements IIssueService {
     return issue;
   }
 
-  async getAll(userId: string, filter: IssueFilter): Promise<IssuePaginatedResponse> {
+  async getAllForUser(userId: string, filter: IssueFilter): Promise<IssuePaginatedResponse> {
     // Set default pagination values
     const page = filter.page || 1;
     const limit = filter.limit || 10;
@@ -68,7 +68,7 @@ export class IssueService extends BaseService<Issue> implements IIssueService {
     };
   }
 
-  async create(userId: string, data: CreateIssueDto): Promise<Issue> {
+  async createForUser(userId: string, data: CreateIssueDto): Promise<Issue> {
     this.validateCreateData(data);
 
     // Add userId to the data
@@ -102,7 +102,7 @@ export class IssueService extends BaseService<Issue> implements IIssueService {
     return issue;
   }
 
-  async update(id: string, userId: string, data: UpdateIssueDto): Promise<Issue> {
+  async updateForUser(id: string, userId: string, data: UpdateIssueDto): Promise<Issue> {
     if (!id) {
       throw new ValidationError('Issue ID is required');
     }
@@ -123,7 +123,7 @@ export class IssueService extends BaseService<Issue> implements IIssueService {
     return await this.issueRepository.update(id, data);
   }
 
-  async delete(id: string, userId: string): Promise<void> {
+  async deleteForUser(id: string, userId: string): Promise<void> {
     if (!id) {
       throw new ValidationError('Issue ID is required');
     }

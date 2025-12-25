@@ -86,7 +86,7 @@ export class IssueHandler extends BaseHandler<Issue> {
         throw new ValidationError('Invalid filter parameters', validationResult.errors);
       }
       
-      const result = await this.issueService.getAll(userId, validationResult.data || {});
+      const result = await this.issueService.getAllForUser(userId, validationResult.data || {});
       return NextResponse.json(result);
     } catch (error) {
       return this.errorHandler.handle(error as Error);
@@ -106,7 +106,7 @@ export class IssueHandler extends BaseHandler<Issue> {
       }
       
       const validatedData = validator.parseData(body);
-      const issue = await this.issueService.create(userId, validatedData);
+      const issue = await this.issueService.createForUser(userId, validatedData);
       
       return NextResponse.json(issue, { status: 201 });
     } catch (error) {
@@ -127,7 +127,7 @@ export class IssueHandler extends BaseHandler<Issue> {
       }
       
       const validatedData = validator.parseData(body);
-      const issue = await this.issueService.update(issueId, userId, validatedData);
+      const issue = await this.issueService.updateForUser(issueId, userId, validatedData);
       
       return NextResponse.json(issue);
     } catch (error) {
@@ -137,7 +137,7 @@ export class IssueHandler extends BaseHandler<Issue> {
 
   private async handleDeleteIssue(issueId: string, userId: string): Promise<NextResponse> {
     try {
-      await this.issueService.delete(issueId, userId);
+      await this.issueService.deleteForUser(issueId, userId);
       return NextResponse.json({ success: true }, { status: 204 });
     } catch (error) {
       return this.errorHandler.handle(error as Error);
