@@ -66,7 +66,7 @@ export class IssueHandler extends BaseHandler<Issue> {
 
   private async handleGetById(issueId: string, userId: string): Promise<NextResponse> {
     try {
-      const issue = await this.issueService.getById(issueId, userId);
+      const issue = await this.issueService.getByIdForUser(issueId, userId);
       return NextResponse.json(issue);
     } catch (error) {
       return this.errorHandler.handle(error as Error);

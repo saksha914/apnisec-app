@@ -19,7 +19,7 @@ export class IssueService extends BaseService<Issue> implements IIssueService {
     this.emailService = new EmailService();
   }
 
-  async getById(id: string, userId: string): Promise<Issue> {
+  async getByIdForUser(id: string, userId: string): Promise<Issue> {
     if (!id) {
       throw new ValidationError('Issue ID is required');
     }

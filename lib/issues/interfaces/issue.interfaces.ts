@@ -11,7 +11,7 @@ export interface IIssueRepository {
 }
 
 export interface IIssueService {
-  getById(id: string, userId: string): Promise<Issue>;
+  getByIdForUser(id: string, userId: string): Promise<Issue>;
   getAll(userId: string, filter: IssueFilter): Promise<IssuePaginatedResponse>;
   create(userId: string, data: CreateIssueDto): Promise<Issue>;
   update(id: string, userId: string, data: UpdateIssueDto): Promise<Issue>;
