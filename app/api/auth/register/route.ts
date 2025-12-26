@@ -3,12 +3,27 @@ import { AuthService } from '@/lib/auth/services/AuthService';
 import { ValidationError, ConflictError } from '@/lib/core/errors/AppErrors';
 
 export async function POST(req: NextRequest) {
-  const authService = new AuthService();
-  
   try {
-    const body = await req.json();
+    // Parse request body first
+    let body;
+    try {
+      body = await req.json();
+    } catch (parseError) {
+      console.error('Failed to parse request body:', parseError);
+      return NextResponse.json(
+        { error: 'Invalid JSON in request body' },
+        { status: 400 }
+      );
+    }
     
+    console.log('Registration attempt for:', body.email);
+    
+    // Initialize AuthService
+    const authService = new AuthService();
+    
+    // Call register method
     const result = await authService.register(body.email, body.password, body.name);
+    console.log('Registration successful for:', body.email);
     
     const response = NextResponse.json({
       user: result.user,
@@ -23,10 +38,10 @@ export async function POST(req: NextRequest) {
     });
     
     return response;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Registration error:', error);
-    console.error('Error type:', typeof error);
-    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    console.error('Error message:', error?.message);
+    console.error('Error stack:', error?.stack);
     
     if (error instanceof ValidationError) {
       return NextResponse.json(

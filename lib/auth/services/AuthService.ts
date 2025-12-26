@@ -12,9 +12,14 @@ export class AuthService implements IAuthService {
   private emailService: EmailService;
 
   constructor() {
-    this.passwordService = new PasswordService();
-    this.tokenService = new TokenService();
-    this.emailService = new EmailService();
+    try {
+      this.passwordService = new PasswordService();
+      this.tokenService = new TokenService();
+      this.emailService = new EmailService();
+    } catch (error) {
+      console.error('Failed to initialize AuthService:', error);
+      throw error;
+    }
   }
 
   async register(email: string, password: string, name?: string): Promise<AuthResponse> {
