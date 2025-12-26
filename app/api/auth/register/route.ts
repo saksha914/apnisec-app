@@ -25,6 +25,8 @@ export async function POST(req: NextRequest) {
     return response;
   } catch (error) {
     console.error('Registration error:', error);
+    console.error('Error type:', typeof error);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     
     if (error instanceof ValidationError) {
       return NextResponse.json(
@@ -40,8 +42,13 @@ export async function POST(req: NextRequest) {
       );
     }
     
+    // Include more detail in development
+    const errorMessage = process.env.NODE_ENV === 'development' && error instanceof Error 
+      ? `Registration failed: ${error.message}` 
+      : 'Registration failed. Please try again.';
+    
     return NextResponse.json(
-      { error: 'Registration failed. Please try again.' },
+      { error: errorMessage },
       { status: 500 }
     );
   }
